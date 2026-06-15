@@ -38,6 +38,10 @@
         display: flex;
         column-gap: 1rem;
       }
+
+      a[aria-current="page"] {
+        background-color: var(--ui-neutral-200);
+      }
     }
 
     > main {

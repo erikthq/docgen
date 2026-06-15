@@ -112,7 +112,7 @@ export async function createDocs({
   structure,
   base: rawBase,
 }: Config = {}) {
-  const base = rawBase?.replace(/\/$/, "") ?? "";
+  const base = rawBase ? `/${rawBase.replace(/^\/|\/$/g, "")}` : "";
   const userPublicDir = resolve("public");
   console.log("building pages...");
   const { routes, descriptions } = await buildPages(
@@ -125,7 +125,9 @@ export async function createDocs({
 
   const server = createServer(
     async (req: IncomingMessage, res: ServerResponse) => {
-      const urlPath = req.url ?? "/";
+      const raw = req.url ?? "/";
+      const urlPath =
+        base && raw.startsWith(base) ? raw.slice(base.length) || "/" : raw;
 
       if (urlPath === "/search-index.json") {
         res.writeHead(200, { "Content-Type": "application/json" });
@@ -153,7 +155,7 @@ export async function createDocs({
   );
 
   server.listen(5151, () => {
-    console.log("listening on http://localhost:5151");
+    console.log("listening on http://localhost:5151" + base);
     // for (const route of routes.keys()) {
     //   console.log(`  ${route}`);
     // }
@@ -176,7 +178,7 @@ export async function buildDocs({
                      ██
                    ▀▀▀`);
 
-  const base = rawBase?.replace(/\/$/, "") ?? "";
+  const base = rawBase ? `/${rawBase.replace(/^\/|\/$/g, "")}` : "";
   const resolvedOut = outDir ?? resolve("dist");
   const userPublicDir = resolve("public");
   const { routes, descriptions } = await buildPages(

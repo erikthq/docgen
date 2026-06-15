@@ -9,18 +9,23 @@ export interface NavItem {
   icon: string;
 }
 
+function isActive(path: string, currentRoute: string): boolean {
+  return currentRoute === path || currentRoute.startsWith(path + "/");
+}
+
 async function buildNav(
   routes: Map<string, SafeHtml>,
   base: string,
+  currentRoute: string,
   structure?: NavItem[],
 ): Promise<SafeHtml> {
   if (!structure) {
     return safe(
       [...routes.keys()]
-        .map(
-          (route) =>
-            `<a href="${base}${route}" class="button ghost">${route === "/" ? "home" : route.slice(1)}</a>`,
-        )
+        .map((route) => {
+          const active = isActive(route, currentRoute);
+          return `<a href="${base}${route}" class="button ghost"${active ? ' aria-current="page"' : ""}>${route === "/" ? "home" : route.slice(1)}</a>`;
+        })
         .join("\n"),
     );
   }
@@ -28,7 +33,8 @@ async function buildNav(
   const links = await Promise.all(
     structure.map(async ({ label, path, icon: iconName }) => {
       const svg = await icon(iconName);
-      return `<a href="${base}${path}" class="button ghost">${svg.value}${label}</a>`;
+      const active = isActive(path, currentRoute);
+      return `<a href="${base}${path}" class="button ghost"${active ? ' aria-current="page"' : ""}>${svg.value}${label}</a>`;
     }),
   );
 
@@ -39,8 +45,9 @@ export async function siteHeader(
   routes: Map<string, SafeHtml>,
   structure?: NavItem[],
   base = "",
+  currentRoute = "",
 ): Promise<SafeHtml> {
-  const nav = await buildNav(routes, base, structure);
+  const nav = await buildNav(routes, base, currentRoute, structure);
 
   return html`
     <header>

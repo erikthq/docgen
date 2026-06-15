@@ -12,7 +12,7 @@ export async function layout(
   favicon = "/favicon.jpg",
   base = "",
 ): Promise<SafeHtml> {
-  const header = await siteHeader(routes, structure, base);
+  const header = await siteHeader(routes, structure, base, currentRoute);
   const aside = sidebar(routes, currentRoute, base);
   const tocNav = await toc(content);
 

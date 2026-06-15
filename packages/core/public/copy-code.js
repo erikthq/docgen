@@ -1,5 +1,5 @@
 import Alpine from "alpinejs";
-import { html } from "./html.js";
+import { html } from "html.js";
 
 Alpine.data("copyCode", () => ({
   template: html`

@@ -67,13 +67,20 @@ export default html`
 
     .home-features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       overflow: hidden;
       margin-inline: 2rem;
       background: var(--border-color);
+
+      max-width: 800px;
+      margin-inline: auto;
+
+      @media (width >= 768px) {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
     .home-feature {
