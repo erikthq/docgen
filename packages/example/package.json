@@ -12,6 +12,5 @@
   },
   "devDependencies": {
     "@types/node": "catalog:"
-  },
-  "packageManager": "pnpm@10.26.0"
+  }
 }
