@@ -1,9 +1,9 @@
 import { html, SafeHtml } from "#html";
-import { siteHeader, type NavItem } from "./components/site-header.ts";
-import { sidebar } from "./components/sidebar.ts";
-import { toc } from "./components/toc.ts";
-import { searchDialog } from "./components/search.ts";
-import { icon } from "./utils/icons.ts";
+import { siteHeader, type NavItem } from "./components/site-header.js";
+import { sidebar } from "./components/sidebar.js";
+import { toc } from "./components/toc.js";
+import { searchDialog } from "./components/search.js";
+import { icon } from "./utils/icons.js";
 
 export async function layout(
   routes: Map<string, SafeHtml>,

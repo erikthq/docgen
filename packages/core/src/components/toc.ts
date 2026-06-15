@@ -1,5 +1,5 @@
 import { html, safe, SafeHtml } from "#html";
-import { icon } from "../utils/icons.ts";
+import { icon } from "../utils/icons.js";
 
 const headingPattern = /<h([1-6])[^>]*\sid="([^"]*)"[^>]*>([\s\S]*?)<\/h\1>/gi;
 

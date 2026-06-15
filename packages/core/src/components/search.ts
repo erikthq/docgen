@@ -1,5 +1,5 @@
 import { html } from "#html";
-import { icon } from "../utils/icons.ts";
+import { icon } from "../utils/icons.js";
 
 export const searchTrigger = html`
   <button class="button outlined search-trigger">

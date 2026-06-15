@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "pnpm run -r --parallel --if-present dev",
-    "build": "pnpm --filter @docgen/example build"
+    "build": "pnpm run -r --parallel --if-present build"
   },
   "devDependencies": {
     "@types/node": "catalog:"

@@ -11,12 +11,12 @@ import {
 import { join, extname, resolve } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { html, safe, SafeHtml } from "#html";
-import { parseMarkdown } from "./utils/parseMarkdown.ts";
-import { serveStatic } from "./utils/serveStatic.ts";
-import { buildSearchIndex } from "./utils/buildSearchIndex.ts";
-import { layout } from "./layout.ts";
-import { type NavItem } from "./components/site-header.ts";
-import ErrorPage from "./components/error.ts";
+import { parseMarkdown } from "./utils/parseMarkdown.js";
+import { serveStatic } from "./utils/serveStatic.js";
+import { buildSearchIndex } from "./utils/buildSearchIndex.js";
+import { layout } from "./layout.js";
+import { type NavItem } from "./components/site-header.js";
+import ErrorPage from "./components/error.js";
 
 export { html, safe };
 export type { NavItem };

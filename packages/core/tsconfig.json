@@ -2,6 +2,9 @@
   "extends": "../../tsconfig.json",
   "include": ["."],
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "#html": ["./src/utils/html.ts"]
+    }
   }
 }

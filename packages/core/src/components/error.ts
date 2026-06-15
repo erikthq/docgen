@@ -1,5 +1,5 @@
 import { html } from "#html";
-import { icon } from "../utils/icons.ts";
+import { icon } from "../utils/icons.js";
 
 export default html`
   <div class="empty">

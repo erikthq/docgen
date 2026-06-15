@@ -1,7 +1,7 @@
 import { html, safe, SafeHtml } from "#html";
-import { icon } from "../utils/icons.ts";
-import schemeToggle from "./scheme-toggle.ts";
-import { searchTrigger } from "./search.ts";
+import { icon } from "../utils/icons.js";
+import schemeToggle from "./scheme-toggle.js";
+import { searchTrigger } from "./search.js";
 
 export interface NavItem {
   label: string;
