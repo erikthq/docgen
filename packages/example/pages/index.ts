@@ -38,6 +38,33 @@ export default html`
       padding-block: 6rem;
     }
 
+    .home-background {
+      opacity: 0.8;
+      background-image:
+        linear-gradient(var(--ui-neutral-100) 1px, transparent 1px),
+        linear-gradient(90deg, var(--ui-neutral-100) 1px, transparent 1px),
+        linear-gradient(var(--ui-neutral-100) 0.5px, transparent 0.5px),
+        linear-gradient(90deg, var(--ui-neutral-100) 0.5px, transparent 0.5px);
+      background-size:
+        50px 50px,
+        50px 50px,
+        10px 10px,
+        10px 10px;
+      background-position:
+        -1px -1px,
+        -1px -1px,
+        -0.5px -0.5px,
+        -0.5px -0.5px;
+
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+        top: 0;
+        z-index: -1;
+
+        mask-image: linear-gradient(black, transparent);
+    }
+
     .home-hero {
       display: grid;
       place-items: center;
@@ -177,6 +204,8 @@ export default html`
   </style>
 
   <div class="home">
+    <div class="home-background"></div>
+
     <section class="home-hero prose">
       <hgroup>
         <h1>docgen</h1>

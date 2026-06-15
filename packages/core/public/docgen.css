@@ -2,6 +2,28 @@
 @import "./search.css" layer(docgen);
 
 @layer docgen {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition,
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    pointer-events: none;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  :root {
+    view-transition-name: none;
+  }
+
   :root {
     --ui-primary: light-dark(#111111, #ffffff);
     --border-color: var(--ui-neutral-200);
@@ -13,13 +35,18 @@
     display: grid;
     grid-template-rows: auto 1fr;
     min-height: 100svh;
+    width: 100vw;
     background-color: var(--ui-background-color);
     overflow-x: clip;
 
     > header {
+      view-transition-name: site-header;
+
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 40px 1fr;
       align-items: center;
+      width: inherit;
+
       column-gap: 1rem;
       padding: 0.5rem 1rem;
       background-color: var(--ui-background-color);
@@ -30,6 +57,19 @@
 
       border-bottom: 1px solid var(--border-color);
 
+      @media (width < 768px) {
+        row-gap: 0.5rem;
+
+        nav {
+          grid-row: 2;
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (width >= 768px) {
+        grid-template-columns: auto 1fr auto;
+      }
+
       img {
         width: 40px;
       }
@@ -37,6 +77,10 @@
       aside {
         display: flex;
         column-gap: 1rem;
+
+        @media (width < 768px) {
+          justify-self: end;
+        }
       }
 
       a[aria-current="page"] {
@@ -45,28 +89,37 @@
     }
 
     > main {
+      --sidebar-width: 220px;
+      --toc-width: 220px;
+
+      position: relative;
+
       display: grid;
       grid-template-columns: 1fr;
       align-items: start;
 
-      &:has(> nav) {
-        grid-template-columns: auto 1fr;
+      @media (width >= 768px) {
+        &:has(> nav) {
+          grid-template-columns: var(--sidebar-width) 1fr;
 
-        > section {
-          border-left: 1px solid var(--border-color);
+          > section {
+            border-left: 1px solid var(--border-color);
+          }
+        }
+
+        &:has(> aside) {
+          grid-template-columns: 1fr var(--toc-width);
+        }
+
+        &:has(> nav):has(> aside) {
+          grid-template-columns: var(--sidebar-width) 1fr var(--toc-width);
         }
       }
 
-      &:has(> aside) {
-        grid-template-columns: 1fr auto;
-      }
-
-      &:has(> nav):has(> aside) {
-        grid-template-columns: auto 1fr auto;
-      }
-
+      /* sidebar */
       > nav {
-        width: 220px;
+        view-transition-name: sidebar;
+
         padding: 1rem 0.5rem;
         text-transform: capitalize;
 
@@ -74,30 +127,62 @@
         top: 55px;
         z-index: 1;
 
+        @media (width < 768px) {
+          display: none;
+        }
+
         a[aria-current="page"] {
           background-color: var(--ui-neutral-200);
         }
       }
 
+      /* mobile menu button */
+      > button {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+
+        @media (width >= 768px) {
+          display: none;
+        }
+      }
+
       > section {
-        padding: 2.5rem 3rem;
+        padding: 2.5rem 0.5rem;
         height: 100%;
+        max-width: 100vw;
+
+        @media (width >= 768px) {
+          padding-inline: 3rem;
+        }
 
         > div {
+          view-transition-name: main-content;
+
           max-width: 800px;
           margin-inline: auto;
         }
       }
 
       > aside {
-        width: 200px;
         padding: 3rem 0.5rem;
 
         position: sticky;
         top: 55px;
         z-index: 1;
+
+        @media (width < 768px) {
+          display: none;
+        }
       }
     }
+  }
+
+  .prose h2 {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    scroll-margin-top: calc(var(--header-h) + 1rem);
   }
 
   .code-filename {
@@ -125,6 +210,9 @@
 
   .shiki {
     position: relative;
+    display: grid;
+    grid-template-columns: 1fr 0px;
+    align-items: start;
 
     padding: 1rem 1.25rem 1rem 2.5rem;
     border: 1px solid var(--border-color);
@@ -136,10 +224,13 @@
     line-height: 1.65;
 
     .copy-code {
-      position: absolute;
+      position: sticky;
       top: 0.5rem;
       right: 0.5rem;
       display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 0;
 
       color: var(--ui-neutral-600);
     }

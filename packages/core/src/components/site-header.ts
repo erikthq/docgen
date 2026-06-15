@@ -46,6 +46,7 @@ export async function siteHeader(
   structure?: NavItem[],
   base = "",
   currentRoute = "",
+  githubLink?: string,
 ): Promise<SafeHtml> {
   const nav = await buildNav(routes, base, currentRoute, structure);
 
@@ -61,9 +62,9 @@ export async function siteHeader(
         ${searchTrigger}
         ${schemeToggle}
 
-        <a
-          id="github-link"
-          href="https://github.com/erikthq/ui"
+        ${githubLink &&
+        html`<a
+          href="${githubLink}"
           target="_blank"
           rel="noopener"
           class="button secondary square"
@@ -71,7 +72,7 @@ export async function siteHeader(
           data-tooltip="bottom"
         >
           ${await icon("brand-github")}
-        </a>
+        </a>`}
       </aside>
     </header>
   `;

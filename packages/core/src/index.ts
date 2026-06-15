@@ -1,14 +1,13 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import {
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-  mkdirSync,
-  existsSync,
-  cpSync,
-  rmSync,
-  Dirent,
-} from "node:fs";
+  readdir,
+  readFile,
+  writeFile,
+  mkdir,
+  access,
+  cp,
+  rm,
+} from "node:fs/promises";
 import { join, extname, resolve } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { html, safe, SafeHtml } from "#html";
@@ -27,15 +26,25 @@ export interface Config {
   outDir?: string;
   base?: string;
   structure?: NavItem[];
+  githubLink?: string;
 }
 
 const corePublicDir = fileURLToPath(new URL("../public", import.meta.url));
 
 const FAVICON_EXTS = ["ico", "svg", "png", "jpg", "jpeg"];
 
-function findFavicon(userPublicDir: string): string {
+async function pathExists(p: string): Promise<boolean> {
+  try {
+    await access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function findFavicon(userPublicDir: string): Promise<string> {
   for (const ext of FAVICON_EXTS) {
-    if (existsSync(join(userPublicDir, `favicon.${ext}`))) {
+    if (await pathExists(join(userPublicDir, `favicon.${ext}`))) {
       return `/favicon.${ext}`;
     }
   }
@@ -47,17 +56,21 @@ function sortKey(name: string): number {
   return isNaN(n) ? Infinity : n;
 }
 
-function scanPages(dir: string, base: string): string[] {
-  const entries = readdirSync(dir, { withFileTypes: true });
+async function scanPages(dir: string, base: string): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
   entries.sort(
     (a, b) => sortKey(a.name) - sortKey(b.name) || a.name.localeCompare(b.name),
   );
-  return entries.flatMap((entry: Dirent) => {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) return scanPages(full, base);
-    if (entry.name.endsWith(".md") || entry.name.endsWith(".ts")) return [full];
-    return [];
-  });
+  const nested = await Promise.all(
+    entries.map((entry) => {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) return scanPages(full, base);
+      if (entry.name.endsWith(".md") || entry.name.endsWith(".ts"))
+        return Promise.resolve([full]);
+      return Promise.resolve([]);
+    }),
+  );
+  return nested.flat();
 }
 
 function fileToRoute(filePath: string, pagesDir: string): string {
@@ -72,14 +85,14 @@ function fileToRoute(filePath: string, pagesDir: string): string {
 }
 
 async function buildPages(pagesDir: string) {
-  const files = scanPages(pagesDir, pagesDir);
+  const files = await scanPages(pagesDir, pagesDir);
 
   const entries = await Promise.all(
     files.map(async (filePath) => {
       const ext = extname(filePath);
       const route = fileToRoute(filePath, pagesDir);
       if (ext === ".md") {
-        const parsed = await parseMarkdown(readFileSync(filePath, "utf-8"));
+        const parsed = await parseMarkdown(await readFile(filePath, "utf-8"));
         return {
           route,
           content: parsed.html,
@@ -111,6 +124,7 @@ export async function createDocs({
   pagesDir,
   structure,
   base: rawBase,
+  githubLink,
 }: Config = {}) {
   const base = rawBase ? `/${rawBase.replace(/^\/|\/$/g, "")}` : "";
   const userPublicDir = resolve("public");
@@ -119,7 +133,7 @@ export async function createDocs({
     pagesDir ?? resolve("pages"),
   );
   console.log("building search index...");
-  const favicon = findFavicon(userPublicDir);
+  const favicon = await findFavicon(userPublicDir);
   const searchIndexJson = buildSearchIndex(routes, descriptions);
   console.log("starting server...");
 
@@ -135,21 +149,21 @@ export async function createDocs({
         return;
       }
 
-      if (serveStatic([userPublicDir, corePublicDir], urlPath, res)) return;
+      if (await serveStatic([userPublicDir, corePublicDir], urlPath, res)) return;
 
       const content = routes.get(urlPath);
 
       if (content === undefined) {
         res.writeHead(404, { "Content-Type": "text/html" });
         res.end(
-          `${await layout(routes, structure, urlPath, ErrorPage, favicon, base)}`,
+          `${await layout(routes, structure, urlPath, ErrorPage, favicon, base, githubLink)}`,
         );
         return;
       }
 
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(
-        `${await layout(routes, structure, urlPath, content, favicon, base)}`,
+        `${await layout(routes, structure, urlPath, content, favicon, base, githubLink)}`,
       );
     },
   );
@@ -169,6 +183,7 @@ export async function buildDocs({
   outDir,
   structure,
   base: rawBase,
+  githubLink,
 }: Config = {}) {
   console.log(`   ▄▄
    ██
@@ -184,24 +199,24 @@ export async function buildDocs({
   const { routes, descriptions } = await buildPages(
     pagesDir ?? resolve("pages"),
   );
-  const favicon = findFavicon(userPublicDir);
+  const favicon = await findFavicon(userPublicDir);
   const searchIndexJson = buildSearchIndex(routes, descriptions);
 
-  rmSync(resolvedOut, { recursive: true, force: true });
-  mkdirSync(resolvedOut, { recursive: true });
-  writeFileSync(join(resolvedOut, ".nojekyll"), "");
-  writeFileSync(join(resolvedOut, "search-index.json"), searchIndexJson);
+  await rm(resolvedOut, { recursive: true, force: true });
+  await mkdir(resolvedOut, { recursive: true });
+  await writeFile(join(resolvedOut, ".nojekyll"), "");
+  await writeFile(join(resolvedOut, "search-index.json"), searchIndexJson);
 
   for (const dir of [corePublicDir, userPublicDir]) {
-    if (existsSync(dir)) cpSync(dir, resolvedOut, { recursive: true });
+    if (await pathExists(dir)) await cp(dir, resolvedOut, { recursive: true });
   }
 
   for (const [route, content] of routes) {
     const dir = route === "/" ? resolvedOut : join(resolvedOut, route);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(
+    await mkdir(dir, { recursive: true });
+    await writeFile(
       join(dir, "index.html"),
-      `${await layout(routes, structure, route, content, favicon, base)}`,
+      `${await layout(routes, structure, route, content, favicon, base, githubLink)}`,
     );
     console.log(`  built ${route}`);
   }

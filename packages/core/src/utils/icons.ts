@@ -1,5 +1,5 @@
 import { safe, SafeHtml } from "#html";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 
 const TABLER_CDN = "https://cdn.jsdelivr.net/npm/@tabler/icons/icons";
@@ -7,9 +7,9 @@ const cachePath = resolve("node_modules/.cache/docgen/icons.json");
 
 const memCache: Record<string, string> = {};
 
-function readCache(): Record<string, string> {
+async function readCache(): Promise<Record<string, string>> {
   try {
-    return JSON.parse(readFileSync(cachePath, "utf-8"));
+    return JSON.parse(await readFile(cachePath, "utf-8"));
   } catch {
     return {};
   }
@@ -18,7 +18,7 @@ function readCache(): Record<string, string> {
 export async function icon(name: string): Promise<SafeHtml> {
   if (memCache[name]) return safe(memCache[name]);
 
-  const diskCache = readCache();
+  const diskCache = await readCache();
   if (diskCache[name]) {
     memCache[name] = diskCache[name];
     return safe(diskCache[name]);
@@ -29,10 +29,10 @@ export async function icon(name: string): Promise<SafeHtml> {
 
   memCache[name] = svg;
 
-  const latest = readCache();
+  const latest = await readCache();
   latest[name] = svg;
-  mkdirSync(dirname(cachePath), { recursive: true });
-  writeFileSync(cachePath, JSON.stringify(latest));
+  await mkdir(dirname(cachePath), { recursive: true });
+  await writeFile(cachePath, JSON.stringify(latest));
 
   return safe(svg);
 }

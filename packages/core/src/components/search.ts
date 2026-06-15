@@ -2,8 +2,10 @@ import { html } from "#html";
 import { icon } from "../utils/icons.ts";
 
 export const searchTrigger = html`
-  <button class="button outlined search-trigger" style="min-width: 160px">
-    ${await icon("search")} Search...
+  <button class="button outlined search-trigger">
+    ${await icon("search")}
+    
+    <span>Search...</span>
 
     <kbd>⌘k</kbd>
   </button>
@@ -48,5 +50,7 @@ export const searchDialog = html`
     </article>
   </dialog>
 
-  <script type="module" src="search.js"></script>
+  <script type="module">
+    import "/search.js";
+  </script>
 `;

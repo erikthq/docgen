@@ -3,6 +3,7 @@ import { siteHeader, type NavItem } from "./components/site-header.ts";
 import { sidebar } from "./components/sidebar.ts";
 import { toc } from "./components/toc.ts";
 import { searchDialog } from "./components/search.ts";
+import { icon } from "./utils/icons.ts";
 
 export async function layout(
   routes: Map<string, SafeHtml>,
@@ -11,9 +12,10 @@ export async function layout(
   content: SafeHtml,
   favicon = "/favicon.jpg",
   base = "",
+  githubLink?: string,
 ): Promise<SafeHtml> {
-  const header = await siteHeader(routes, structure, base, currentRoute);
-  const aside = sidebar(routes, currentRoute, base);
+  const header = await siteHeader(routes, structure, base, currentRoute, githubLink);
+  const sidebarComponent = sidebar(routes, currentRoute, base);
   const tocNav = await toc(content);
 
   const h1Match = content.value.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
@@ -25,6 +27,7 @@ export async function layout(
     <html>
       <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="docgen-base" content="${base}" />
         <title>${pageTitle}</title>
         <link rel="icon" href="${base}${favicon}" />
@@ -37,7 +40,8 @@ export async function layout(
               "alpinejs": "https://esm.sh/alpinejs@3.15.12",
               "@alpinejs/persist": "https://esm.sh/@alpinejs/persist@3.15.12",
               "minisearch": "https://esm.sh/minisearch@7",
-              "html.js": "${base}/html.js"
+              "html.js": "${base}/html.js",
+              "search.js": "${base}/search.js"
             }
           }
         </script>
@@ -55,7 +59,21 @@ export async function layout(
         ${header}
 
         <main>
-          ${aside.value && html`<nav>${aside}</nav>`}
+          ${sidebarComponent.value &&
+          html`
+            <nav>${sidebarComponent}</nav>
+
+            <button
+              class="square ghost"
+              onclick="document.getElementById('mobile_sidebar')?.showModal()"
+            >
+              ${await icon("menu")}
+            </button>
+
+            <dialog id="mobile_sidebar" closedby="any">
+              <article>${sidebarComponent}</article>
+            </dialog>
+          `}
           ${currentRoute === "/"
             ? content
             : html`<section>
