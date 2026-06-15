@@ -182,8 +182,8 @@ export default html`
       ${safe(installCmd)}
 
       <div class="home-actions">
-        <a href="/guide" class="button">Get started</a>
-        <a href="/api" class="button ghost">API reference</a>
+        <a href="/docgen/guide" class="button">Get started</a>
+        <a href="/docgen/api" class="button ghost">API reference</a>
       </div>
     </section>
 

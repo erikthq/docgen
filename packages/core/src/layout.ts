@@ -27,9 +27,9 @@ export async function layout(
         <meta charset="utf-8" />
         <meta name="docgen-base" content="${base}" />
         <title>${pageTitle}</title>
-        <link rel="icon" href="${base}${favicon}" />
+        <link rel="icon" href="${favicon}" />
         <link rel="stylesheet" href="https://esm.sh/@erikt/ui" />
-        <link rel="stylesheet" href="${base}/docgen.css" />
+        <link rel="stylesheet" href="/docgen.css" />
 
         <script type="importmap">
           {
@@ -48,7 +48,7 @@ export async function layout(
           Alpine.plugin(persist);
         </script>
 
-        <script src="${base}/copy-code.js" type="module"></script>
+        <script src="/copy-code.js" type="module"></script>
       </head>
       <body>
         ${header}
