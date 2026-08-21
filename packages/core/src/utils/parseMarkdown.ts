@@ -4,7 +4,6 @@ import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
-import rehypeShiki from "@shikijs/rehype";
 import rehypeSlug from "rehype-slug";
 import { safe, SafeHtml } from "#html";
 
@@ -45,21 +44,28 @@ export interface ParsedPage {
   frontmatter: Record<string, string>;
 }
 
-function rehypeCodeFilename() {
+function rehypeHighlightCode() {
   return (tree: any) => {
     function walk(node: any, parent: any, index: number) {
       if (node.type === "element" && node.tagName === "pre") {
-        const filename = node.properties?.dataFilename as string | undefined;
-        const isTerminal = node.properties?.dataTerminal === "true";
+        const code = (node.children ?? []).find(
+          (child: any) => child.type === "element" && child.tagName === "code",
+        );
+        const meta = code?.data?.meta as string | undefined;
+        const isTerminal = meta === "terminal";
+        const filename = !isTerminal ? meta : undefined;
 
-        if (isTerminal && parent) {
-          console.log("node.properties", node.properties.dataTerminal);
-          delete node.properties.dataTerminal;
-          node.properties.className = [
-            ...(node.properties.className ?? []),
-            "code-terminal",
-          ];
-          parent.children.splice(index, 0, {
+        node.properties["x-data"] = "copyCode";
+        node.properties.className = [
+          ...(node.properties.className ?? []),
+          "code-block",
+        ];
+
+        const replacement: any[] = [];
+
+        if (isTerminal) {
+          node.properties.className.push("code-terminal");
+          replacement.push({
             type: "element",
             tagName: "div",
             properties: { className: ["code-terminal-header"] },
@@ -91,14 +97,24 @@ function rehypeCodeFilename() {
               },
             ],
           });
-        } else if (filename && parent) {
-          delete node.properties.dataFilename;
-          parent.children.splice(index, 0, {
+        } else if (filename) {
+          replacement.push({
             type: "element",
             tagName: "div",
             properties: { className: ["code-filename"] },
             children: [{ type: "text", value: filename }],
           });
+        }
+
+        replacement.push({
+          type: "element",
+          tagName: "micro-lighter",
+          properties: isTerminal ? {} : { "line-numbers": true },
+          children: [node],
+        });
+
+        if (parent) {
+          parent.children.splice(index, 1, ...replacement);
         }
       }
       if (node.children) {
@@ -118,41 +134,7 @@ const processor = unified()
   .use(remarkExtractFrontmatter)
   .use(remarkRehype)
   .use(rehypeSlug)
-  .use(rehypeShiki, {
-    langs: [
-      "javascript",
-      "typescript",
-      "jsx",
-      "tsx",
-      "html",
-      "css",
-      "json",
-      "yaml",
-      "toml",
-      "bash",
-      "sh",
-      "markdown",
-      "python",
-      "rust",
-      "go",
-    ],
-    themes: { light: "github-light", dark: "github-dark" },
-    defaultColor: false,
-    transformers: [
-      {
-        pre(node) {
-          node.properties["x-data"] = "copyCode";
-          const meta = (this.options.meta as any)?.__raw as string | undefined;
-          if (meta === "terminal") {
-            node.properties.dataTerminal = "true";
-          } else if (meta) {
-            node.properties.dataFilename = meta;
-          }
-        },
-      },
-    ],
-  })
-  .use(rehypeCodeFilename)
+  .use(rehypeHighlightCode)
   .use(rehypeStringify)
   .freeze();
 

@@ -1,22 +1,14 @@
-import { html, icon, safe } from "@erikt/docgen";
-import { createHighlighter } from "shiki";
+import { html, icon } from "@erikt/docgen";
 
-const highlighter = await createHighlighter({
-  themes: ["github-light", "github-dark"],
-  langs: ["bash", "ts"],
-});
-
-function highlight(code: string, lang: "bash" | "ts"): string {
-  return highlighter.codeToHtml(code, {
-    lang,
-    themes: { light: "github-light", dark: "github-dark" },
-    defaultColor: false,
-  });
+function codeBlock(code: string, lang: string) {
+  return html`<micro-lighter
+    ><pre class="code-block" x-data="copyCode"><code class="language-${lang}">${code}</code></pre></micro-lighter
+  >`;
 }
 
-const installCmd = highlight("pnpm add @erikt/docgen", "bash");
+const installCmd = codeBlock("pnpm add @erikt/docgen", "bash");
 
-const configSnippet = highlight(
+const configSnippet = codeBlock(
   `import { defineDocs } from "@erikt/docgen";
 
 export default await defineDocs({
@@ -25,7 +17,7 @@ export default await defineDocs({
   "ts",
 );
 
-const runCmd = highlight(
+const runCmd = codeBlock(
   `pnpm docgen dev\n# listening on http://localhost:5151`,
   "bash",
 );
@@ -215,7 +207,7 @@ export default html`
         </p>
       </hgroup>
 
-      ${safe(installCmd)}
+      ${installCmd}
 
       <div class="home-actions">
         <a href="/guide" class="button">Get started</a>
@@ -248,8 +240,8 @@ export default html`
       <div class="home-feature">
         <strong>Syntax highlighting</strong>
         <p>
-          Code blocks are highlighted at build time via Shiki with accurate
-          language grammars and light/dark themes.
+          Code blocks are highlighted in the browser via MicroLighter, using
+          the CSS Custom Highlight API with accurate language grammars.
         </p>
       </div>
       <div class="home-feature">
@@ -274,20 +266,20 @@ export default html`
         <div class="home-step">
           <div>
             <strong>Install</strong>
-            ${safe(installCmd)}
+            ${installCmd}
           </div>
         </div>
         <div class="home-step">
           <div>
             <strong>Configure</strong>
             <p>Create <code>docs.config.ts</code> in your project root.</p>
-            ${safe(configSnippet)}
+            ${configSnippet}
           </div>
         </div>
         <div class="home-step">
           <div>
             <strong>Run</strong>
-            ${safe(runCmd)}
+            ${runCmd}
           </div>
         </div>
       </div>

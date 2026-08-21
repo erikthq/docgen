@@ -1,13 +1,13 @@
 {
   "name": "@erikt/docgen",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "bin": {
     "docgen": "./dist/bin.js"
   },
   "scripts": {
-    "dev": "tsc --project tsconfig.build.json && cp -r public dist/ && tsc --project tsconfig.build.json --watch",
-    "build": "tsc --project tsconfig.build.json && cp -r public dist/"
+    "dev": "tsc --project tsconfig.build.json && cp -r public dist/ && cp -r node_modules/microlighter/dist dist/public/microlighter && tsc --project tsconfig.build.json --watch",
+    "build": "tsc --project tsconfig.build.json && cp -r public dist/ && cp -r node_modules/microlighter/dist dist/public/microlighter"
   },
   "imports": {
     "#html": "./dist/utils/html.js"
@@ -19,12 +19,12 @@
     "dist"
   ],
   "dependencies": {
-    "@shikijs/rehype": "catalog:",
+    "microlighter": "^2.1.0",
     "minisearch": "catalog:",
     "rehype-slug": "catalog:",
     "rehype-stringify": "catalog:",
-    "remark-gfm": "catalog:",
     "remark-frontmatter": "catalog:",
+    "remark-gfm": "catalog:",
     "remark-parse": "catalog:",
     "remark-rehype": "catalog:",
     "unified": "catalog:"

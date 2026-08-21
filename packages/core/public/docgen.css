@@ -183,12 +183,18 @@
     scroll-margin-top: calc(var(--header-h) + 1rem);
   }
 
-  .code-filename {
-    --shiki-light: #24292e;
-    --shiki-dark: #e1e4e8;
-    --shiki-light-bg: #fff;
-    --shiki-dark-bg: #24292e;
+  micro-lighter {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
+  micro-lighter::part(line-numbers) {
+    font-size: 0.9rem;
+    padding: 1rem 0.75rem 1rem 1rem;
+  }
+
+  .code-filename {
     display: block;
     padding: 0.75rem 0.75rem;
     font-size: 0.9rem;
@@ -198,9 +204,10 @@
     border-radius: 8px 8px 0 0;
 
     color: var(--ui-neutral-400);
+    background-color: var(--syntax-background);
   }
 
-  .code-filename + .shiki {
+  .code-filename + micro-lighter {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     margin-top: 0;
@@ -216,15 +223,13 @@
     border-radius: 8px 8px 0 0;
   }
 
-  .code-terminal-header + pre {
+  .code-terminal-header + micro-lighter {
     margin-top: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 
-    & .line {
-      &::before {
-        content: "$";
-      }
+    .copy-code {
+      color: #888;
     }
   }
 
@@ -249,32 +254,13 @@
     background-color: #28c840;
   }
 
-  .code-terminal-header + .code-terminal {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-color: #555;
-    margin-top: 0;
-    padding-left: 1.25rem;
-
-    .line::before {
-      display: none;
-    }
-
-    .copy-code {
-      color: #888;
-    }
-  }
-
-  .shiki {
+  .code-block {
     position: relative;
     display: grid;
     grid-template-columns: 1fr 0px;
     align-items: start;
 
-    padding: 1rem 1.25rem 1rem 2.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    counter-reset: line;
+    padding: 1rem 1.25rem;
     overflow-x: auto;
 
     font-size: 0.9rem;
@@ -291,53 +277,5 @@
 
       color: var(--ui-neutral-600);
     }
-
-    .line {
-      position: relative;
-      counter-increment: line;
-
-      &::before {
-        content: counter(line);
-        position: absolute;
-        left: -2.25rem;
-        width: 1.75rem;
-        text-align: right;
-        color: var(--ui-neutral-400);
-        user-select: none;
-        pointer-events: none;
-      }
-    }
-  }
-
-  .shiki,
-  .shiki span {
-    color: var(--shiki-light);
-    background-color: var(--shiki-light-bg);
-  }
-
-  .code-filename {
-    background-color: var(--shiki-light-bg);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    [data-color-scheme="revert-layer"] .shiki,
-    [data-color-scheme="revert-layer"] .shiki span {
-      color: var(--shiki-dark);
-      background-color: var(--shiki-dark-bg);
-    }
-
-    [data-color-scheme="revert-layer"] .code-filename {
-      background-color: var(--shiki-dark-bg);
-    }
-  }
-
-  [data-color-scheme="dark"] .shiki,
-  [data-color-scheme="dark"] .shiki span {
-    color: var(--shiki-dark);
-    background-color: var(--shiki-dark-bg);
-  }
-
-  [data-color-scheme="dark"] .code-filename {
-    background-color: var(--shiki-dark-bg);
   }
 }

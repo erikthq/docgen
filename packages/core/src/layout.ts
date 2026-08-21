@@ -26,7 +26,7 @@ export async function layout(
     : siteName;
 
   return html`<!DOCTYPE html>
-    <html>
+    <html data-syntax-theme="github">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,6 +35,7 @@ export async function layout(
         <link rel="icon" href="${base}${favicon}" />
         <link rel="stylesheet" href="https://esm.sh/@erikt/ui" />
         <link rel="stylesheet" href="${base}/docgen.css" />
+        <link rel="stylesheet" href="${base}/microlighter/themes/github.css" />
         ${brandColor && html`<style>:root { --ui-primary: ${brandColor}; }</style>`}
 
         <script type="importmap">
@@ -56,6 +57,10 @@ export async function layout(
           Alpine.plugin(persist);
         </script>
 
+        <script
+          type="module"
+          src="${base}/microlighter/micro-lighter-element.js"
+        ></script>
         <script src="${base}/copy-code.js" type="module"></script>
       </head>
       <body>

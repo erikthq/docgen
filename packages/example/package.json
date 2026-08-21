@@ -8,8 +8,7 @@
     "build": "docgen build"
   },
   "dependencies": {
-    "@erikt/docgen": "workspace:*",
-    "shiki": "catalog:"
+    "@erikt/docgen": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:"
