@@ -114,6 +114,7 @@ async function buildPages(pagesDir: string) {
           route,
           content: parsed.html,
           description: parsed.frontmatter.description ?? "",
+          label: parsed.frontmatter.label ?? "",
         };
       }
       const content = (await import(pathToFileURL(filePath).href))
@@ -122,7 +123,7 @@ async function buildPages(pagesDir: string) {
         console.log(
           `  [perf] ${(performance.now() - t0).toFixed(1)}ms  ${route} (ts)`,
         );
-      return { route, content, description: "" };
+      return { route, content, description: "", label: "" };
     }),
   );
 
@@ -130,8 +131,11 @@ async function buildPages(pagesDir: string) {
   const descriptions = new Map(
     entries.map(({ route, description }) => [route, description]),
   );
+  const labels = new Map(
+    entries.filter(({ label }) => label).map(({ route, label }) => [route, label]),
+  );
 
-  return { routes, descriptions };
+  return { routes, descriptions, labels };
 }
 
 export async function defineDocs(config: Config): Promise<Config> {
@@ -154,7 +158,7 @@ export async function createDocs({
   const userPublicDir = resolve("public");
   console.log("building pages...");
   const t0 = perf ? performance.now() : 0;
-  const { routes, descriptions } = await buildPages(
+  const { routes, descriptions, labels } = await buildPages(
     pagesDir ?? resolve("pages"),
   );
   if (perf)
@@ -200,14 +204,14 @@ export async function createDocs({
         }
         res.writeHead(404, { "Content-Type": "text/html" });
         res.end(
-          `${await layout(routes, structure, urlPath, ErrorPage, favicon, base, githubLink, siteName, brandColor)}`,
+          `${await layout(routes, labels, structure, urlPath, ErrorPage, favicon, base, githubLink, siteName, brandColor)}`,
         );
         return;
       }
 
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(
-        `${await layout(routes, structure, urlPath, content, favicon, base, githubLink, siteName, brandColor)}`,
+        `${await layout(routes, labels, structure, urlPath, content, favicon, base, githubLink, siteName, brandColor)}`,
       );
     },
   );
@@ -242,7 +246,7 @@ export async function buildDocs({
   const base = rawBase ? `/${rawBase.replace(/^\/|\/$/g, "")}` : "";
   const resolvedOut = outDir ?? resolve("dist");
   const userPublicDir = resolve("public");
-  const { routes, descriptions } = await buildPages(
+  const { routes, descriptions, labels } = await buildPages(
     pagesDir ?? resolve("pages"),
   );
   const favicon = await findFavicon(userPublicDir);
@@ -283,7 +287,7 @@ export async function buildDocs({
     await mkdir(dir, { recursive: true });
     await writeFile(
       join(dir, "index.html"),
-      `${await layout(routes, structure, route, content, favicon, base, githubLink, siteName, brandColor)}`,
+      `${await layout(routes, labels, structure, route, content, favicon, base, githubLink, siteName, brandColor)}`,
     );
     console.log(`  built ${route}`);
   }

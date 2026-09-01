@@ -2,6 +2,7 @@ import { html, safe, SafeHtml } from "#html";
 
 export function sidebar(
   routes: Map<string, SafeHtml>,
+  labels: Map<string, string>,
   currentRoute: string,
   base = "",
 ): SafeHtml {
@@ -31,7 +32,9 @@ export function sidebar(
   return html`<menu>
     <li><small>${label}</small></li>
     ${children.map((r) => {
-      const name = r === section ? "overview" : (r.split("/").pop() ?? r);
+      const name =
+        labels.get(r) ??
+        (r === section ? "overview" : (r.split("/").pop() ?? r));
       const active = r === currentRoute;
       return html`<li>
         <a

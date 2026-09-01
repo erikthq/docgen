@@ -1,5 +1,5 @@
 ---
-description: How to write Markdown and TypeScript pages, use file-based routing, order sidebar links, and serve static assets.
+description: How to write Markdown and TypeScript pages, set page frontmatter, use file-based routing, label and order sidebar links, and serve static assets.
 ---
 
 # Writing pages
@@ -22,6 +22,40 @@ Standard CommonMark syntax works as expected. Code blocks are highlighted automa
 const greeting = "hello";
 ```
 ````
+
+## Frontmatter
+
+A markdown page can start with a YAML frontmatter block. It is stripped from the rendered output and used as page metadata.
+
+```md 4-deployment.md
+---
+label: Deploying
+description: How to deploy your site to GitHub Pages.
+---
+
+# Deployment
+```
+
+| Key           | Effect                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| `label`       | Text used for this page's link in the sidebar. Defaults to the filename.                   |
+| `description` | Shown under the page title in search results. Defaults to the page's first paragraph.      |
+
+Frontmatter is markdown-only — `.ts` pages have no equivalent, so their sidebar links always use the filename.
+
+### Naming sidebar links
+
+Sidebar links are labelled with the filename by default, which keeps them short but lowercase and hyphenated. Set `label` when you want something more readable:
+
+```md 1-installation.md
+---
+label: Getting started
+---
+
+# Installation
+```
+
+The link now reads "Getting started", while the route stays `/guide/installation` — `label` never affects the URL. On a section's index page, `label` replaces the default `overview` link text.
 
 ## TypeScript pages
 
@@ -59,11 +93,13 @@ pages/guide/2-configuration.md
 pages/guide/3-pages.md
 ```
 
-The prefix is stripped from both the URL and the displayed link text. Unprefixed files are sorted alphabetically after prefixed ones.
+The prefix is stripped from both the URL and the displayed link text. Unprefixed files are sorted alphabetically after prefixed ones. To change the link text itself, use the `label` frontmatter key rather than renaming the file.
 
 ## Sidebar navigation
 
 Any directory under `pages/` automatically generates a sidebar listing its pages. The sidebar appears on all pages within that directory, including the section index.
+
+The section heading comes from the directory name, and each link is labelled with its filename — override a single link with the [`label` frontmatter key](#naming-sidebar-links).
 
 ## Static assets
 

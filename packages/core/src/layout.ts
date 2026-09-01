@@ -7,6 +7,7 @@ import { icon } from "./utils/icons.js";
 
 export async function layout(
   routes: Map<string, SafeHtml>,
+  labels: Map<string, string>,
   structure: NavItem[] | undefined,
   currentRoute: string,
   content: SafeHtml,
@@ -17,7 +18,7 @@ export async function layout(
   brandColor?: string,
 ): Promise<SafeHtml> {
   const header = await siteHeader(routes, structure, base, currentRoute, githubLink);
-  const sidebarComponent = sidebar(routes, currentRoute, base);
+  const sidebarComponent = sidebar(routes, labels, currentRoute, base);
   const tocNav = await toc(content);
 
   const h1Match = content.value.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);

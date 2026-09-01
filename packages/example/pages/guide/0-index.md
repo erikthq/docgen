@@ -12,7 +12,7 @@ A minimal documentation site generator built on Node.js native TypeScript. Point
 - **Markdown** — full CommonMark with syntax highlighting via Shiki
 - **No build step** — runs TypeScript directly via Node.js `>=23.6.0`
 - **Static output** — `docgen build` generates a GitHub Pages-compatible `dist/`
-- **Sidebar navigation** — nested directories automatically produce section sidebars
+- **Sidebar navigation** — nested directories automatically produce section sidebars, with link text set per page via frontmatter
 - **Table of contents** — headings on each page are linked in a right-hand column
 - **Light / dark / system** colour scheme with localStorage persistence
 

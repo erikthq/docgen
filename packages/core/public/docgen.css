@@ -99,20 +99,13 @@
       align-items: start;
 
       @media (width >= 768px) {
-        &:has(> nav) {
-          grid-template-columns: var(--sidebar-width) 1fr;
-
-          > section {
-            border-left: 1px solid var(--border-color);
-          }
-        }
-
-        &:has(> aside) {
-          grid-template-columns: 1fr var(--toc-width);
-        }
-
-        &:has(> nav):has(> aside) {
+        &:not(:has(.home)) {
           grid-template-columns: var(--sidebar-width) 1fr var(--toc-width);
+        }
+
+        > section {
+          grid-column: 2;
+          border-left: 1px solid var(--border-color);
         }
       }
 
@@ -260,7 +253,7 @@
     grid-template-columns: 1fr 0px;
     align-items: start;
 
-    padding: 1rem 1.25rem;
+    padding: 1rem 3rem 1.25rem 1.25rem;
     overflow-x: auto;
 
     font-size: 0.9rem;
@@ -274,6 +267,7 @@
       justify-content: center;
       align-items: center;
       height: 0;
+      translate: 2rem;
 
       color: var(--ui-neutral-600);
     }
